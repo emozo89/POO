@@ -4,11 +4,11 @@ from datetime import datetime
 
 class Persona:
     """Clase base (Superclase) que abstrae las características de una persona."""
-    
+
     def __init__(self, nombre: str, rut: str, correo: str):
-        self._nombre = nombre
+        self.nombre = nombre
         self._rut = rut
-        self._correo = correo
+        self.correo = correo
 
     # --- Getters y Setters con Encapsulamiento ---
     @property
@@ -39,20 +39,20 @@ class Persona:
 
 class Empleado(Persona):
     """Clase derivada (Subclase) que hereda de Persona e incorpora atributos laborales."""
-    
+
     def __init__(
-        self, 
-        id_empleado: int, 
-        nombre: str, 
-        rut: str, 
-        correo: str, 
-        fecha_ingreso: str = None, 
-        salario: float = 0.0, 
+        self,
+        id_empleado: int,
+        nombre: str,
+        rut: str,
+        correo: str,
+        fecha_ingreso: str = None,
+        salario: float = 0.0,
         cargo: str = None
     ):
         # Delegate a la superclase Persona la inicialización de atributos personales
         super().__init__(nombre=nombre, rut=rut, correo=correo)
-        
+
         # Atributos propios de Empleado
         self._id_empleado = id_empleado
         self.fecha_ingreso = fecha_ingreso
@@ -64,19 +64,39 @@ class Empleado(Persona):
         """Devuelve el ID del empleado."""
         return self._id_empleado
 
+class Departamento:
+    """Representa un departamento de EcoTech Solutions."""
+
+    def __init__(self, id_departamento: int, nombre: str):
+        self._id_departamento = id_departamento
+        self._nombre = nombre
+
+    @property
+    def id_departamento(self):
+        """Devuelve el ID del departamento."""
+        return self._id_departamento
+
+    @property
+    def nombre(self):
+        """Devuelve el nombre del departamento."""
+        return self._nombre
+
 class Proyecto:
     """Identifica un proyecto en curso con su fecha de inicio."""
     def __init__(self, id_proyecto: int, nombre_proyecto: str, fecha_inicio: str):
         self.id_proyecto = id_proyecto
         self.nombre_proyecto = nombre_proyecto
         self.fecha_inicio = fecha_inicio
+        self._empleados: list[Empleado] = []
 
     def asignar_empleado(self, empleado: Empleado) -> str:
         """Asigna un empleado al proyecto y devuelve un mensaje de confirmación."""
+        self._empleados.append(empleado)
         return f"Empleado {empleado.nombre} asignado al proyecto {self.nombre_proyecto}."
 
     def desasignar_empleado(self, empleado: Empleado) -> str:
         """Desasigna un empleado del proyecto y devuelve un mensaje de confirmación."""
+        self._empleados.remove(empleado)
         return f"Empleado {empleado.nombre} removido del proyecto {self.nombre_proyecto}."
 
 
@@ -114,4 +134,3 @@ class Informe:
     def generar_reporte(self) -> str:
         """Genera un resumen del informe y devuelve un mensaje de confirmación."""
         return f"Informe #{self.id_informe} [Empleado: {self.id_empleado}, Proyecto: {self.id_proyecto}, Depto: {self.id_departamento}]"
-    
