@@ -35,7 +35,7 @@ def menu_principal():
         print("5. Consultar Clima para Proyectos (API)")
         print("6. Consultar Indicador Económico / Salarios (API)")
         print("7. Salir")
-        
+
         opcion = input("Seleccione una opción: ").strip()
 
         if opcion == "1":
@@ -114,4 +114,3 @@ def menu_principal():
 if __name__ == "__main__":
     inicializar_bd()
     menu_principal()
-    

@@ -132,7 +132,20 @@ def obtener_empleados() -> list:
         return []
     try:
         cursor = conn.cursor()
-        cursor.execute("SELECT id_empleado, nombre, rut, correo, fecha_ingreso, salario, cargo FROM empleados;")
+        cursor.execute("""
+            SELECT
+                e.id_empleado,
+                p.nombre,
+                p.rut,
+                p.correo,
+                e.fecha_ingreso,
+                e.salario,
+                e.cargo,
+                d.nombreDepartamento
+            FROM Empleado e
+            LEFT JOIN Persona p ON e.rut = p.rut
+            LEFT JOIN Departamento d ON e.idDepartamento = d.idDepartamento
+        """)
         return cursor.fetchall()
     finally:
         conn.close()
@@ -145,7 +158,7 @@ def actualizar_empleado(id_emp: int, nombre: str, correo: str, salario: float, c
     try:
         with conn:
             cursor = conn.execute(
-                "UPDATE empleados SET nombre = ?, correo = ?, salario = ?, cargo = ? WHERE id_empleado = ?;",
+                "UPDATE Empleado SET nombre = ?, correo = ?, salario = ?, cargo = ? WHERE id_empleado = ?;",
                 (nombre, correo, salario, cargo, id_emp)
             )
             return cursor.rowcount > 0
