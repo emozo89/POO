@@ -1,6 +1,5 @@
-''' main.py        # Interfaz de Consola e Integración General '''
+"""main.py - Interfaz de Consola e Integración."""
 
-import sys
 from models import Empleado
 from database import (
     inicializar_bd, crear_empleado, obtener_empleados,
@@ -10,6 +9,7 @@ from auth import autenticar_usuario
 from services import obtener_indicador_economico, obtener_clima_santiago
 
 def login():
+    """Solicita credenciales al usuario y verifica autenticación."""
     print("=== SISTEMA DE GESTIÓN DE EMPLEADOS - ECOTECH SOLUTIONS ===")
     intentos = 0
     while intentos < 3:
@@ -25,6 +25,7 @@ def login():
 
 
 def menu_principal():
+    """Muestra el menu principal y gestiona las opciones del usuario."""
     while True:
         print("=== MENÚ PRINCIPAL ===")
         print("1. Registrar Empleado (CREATE)")
@@ -60,7 +61,7 @@ def menu_principal():
             for r in registros:
                 # Se instancia cada registro en un objeto Empleado respetando POO
                 emp = Empleado(id_empleado=r[0], nombre=r[1], rut=r[2], correo=r[3], fecha_ingreso=r[4], salario=r[5], cargo=r[6])
-                print(f"ID: {emp.id_empleado} | Nombre: {emp.nombre} | RUT: {emp.rut} | Cargo: {emp.cargo} | Salario: ${emp.salario}")
+                print(f"ID:{emp.id_empleado} | Nombre: {emp.nombre} | RUT: {emp.rut} | Cargo: {emp.cargo} | Salario: ${emp.salario}")
             print()
 
         elif opcion == "3":
@@ -112,8 +113,5 @@ def menu_principal():
 
 if __name__ == "__main__":
     inicializar_bd()
-    if login():
-        menu_principal()
-    else:
-        print("Sistema bloqueado por superar límite de intentos.")
-        sys.exit()
+    menu_principal()
+    

@@ -84,8 +84,10 @@ def inicializar_bd():
 # --- OPERACIONES CRUD DE EMPLEADOS ---
 
 def crear_empleado(nombre: str, rut: str, correo: str, fecha_ingreso: str, salario: float, cargo: str, id_depto: int) -> bool:
+    """Crea un nuevo empleado en la base de datos."""
     conn = obtener_conexion()
-    if not conn: return False
+    if not conn: 
+        return False
     try:
         with conn:
             conn.execute(
@@ -101,8 +103,10 @@ def crear_empleado(nombre: str, rut: str, correo: str, fecha_ingreso: str, salar
         return False
 
 def obtener_empleados() -> list:
+    """Obtiene todos los empleados de la base de datos."""
     conn = obtener_conexion()
-    if not conn: return []
+    if not conn: 
+        return []
     try:
         cursor = conn.cursor()
         cursor.execute("SELECT id_empleado, nombre, rut, correo, fecha_ingreso, salario, cargo FROM empleados;")
@@ -111,8 +115,10 @@ def obtener_empleados() -> list:
         conn.close()
 
 def actualizar_empleado(id_emp: int, nombre: str, correo: str, salario: float, cargo: str) -> bool:
+    """Actualiza la información de un empleado en la base de datos."""
     conn = obtener_conexion()
-    if not conn: return False
+    if not conn: 
+        return False
     try:
         with conn:
             cursor = conn.execute(
@@ -124,11 +130,14 @@ def actualizar_empleado(id_emp: int, nombre: str, correo: str, salario: float, c
         conn.close()
 
 def eliminar_empleado(id_emp: int) -> bool:
+    """Elimina un empleado de la base de datos."""
     conn = obtener_conexion()
-    if not conn: return False
+    if not conn: 
+        return False
     try:
         with conn:
             cursor = conn.execute("DELETE FROM empleados WHERE id_empleado = ?;", (id_emp,))
             return cursor.rowcount > 0
     finally:
         conn.close()
+        
