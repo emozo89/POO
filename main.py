@@ -1,5 +1,7 @@
 """main.py - Interfaz de Consola e Integración."""
 
+from getpass import getpass
+
 from models import Empleado
 from database import (
     inicializar_bd, crear_empleado, obtener_empleados,
@@ -14,7 +16,7 @@ def login():
     intentos = 0
     while intentos < 3:
         user = input("Usuario: ").strip()
-        pwd = input("Contraseña: ").strip()
+        pwd = getpass("Contraseña: ").strip()
         if autenticar_usuario(user, pwd):
             print(f"\n[OK] Autenticación exitosa. Bienvenido, {user.capitalize()}.\n")
             return True
