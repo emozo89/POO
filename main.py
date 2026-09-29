@@ -92,28 +92,69 @@ def menu_principal():
 
         elif opcion == "5":
             print("\n[API] Consultando servicio meteorológico...")
+
             clima = obtener_clima_santiago()
+
             if clima["exito"]:
-                print(f"Temperatura en Santiago: {clima['temperatura']}°C | Viento: {clima['viento']} km/h\n")
+                print("\n--- CLIMA ACTUAL EN SANTIAGO ---")
+
+                print(
+                    f"Temperatura: "
+                    f"{clima['temperatura']} °C"
+                )
+
+                print(
+                    f"Humedad: "
+                    f"{clima['humedad']} %"
+                )
+
+                print(
+                    f"Estado del tiempo: "
+                    f"{clima['estado']}"
+                )
+
+                if clima["viento"] is not None:
+                    print(
+                        f"Viento: "
+                        f"{clima['viento']} km/h"
+                    )
+
+                print()
+
             else:
-                print(f"Error: {clima['mensaje']}\n")
+                print(
+                    f"[API ERROR] "
+                    f"{clima['mensaje']}\n"
+                )
 
         elif opcion == "6":
-            ind = input("Moneda a consultar (dolar, euro, uf): ").strip()
-            if not validar_moneda(ind):
-                print("[ERROR] Moneda no válida. Intente nuevamente.\n")
-                continue
-            res = obtener_indicador_economico(ind)
-            if res["exito"]:
-                print(f"[API] 1 {res['moneda'].upper()} = ${res['valor']} ({res['unidad']})\n")
-            else:
-                print(f"[API ERROR] {res['mensaje']}\n")
+            print("\n--- CONSULTA DE INDICADOR ECONÓMICO ---")
 
-        elif opcion == "7":
-            print("Cerrando sesión en EcoTech. Hasta pronto.")
-            break
-        else:
-            print("[OPCIÓN INVÁLIDA] Intente nuevamente.\n")
+            ind = input(
+                "Moneda a consultar (dolar, euro, uf): "
+            ).strip().lower()
+
+            if not validar_moneda(ind):
+                print(
+                    "[ERROR] Moneda no válida. "
+                    "Ingrese dolar, euro o uf.\n"
+                )
+                continue
+
+            res = obtener_indicador_economico(ind)
+
+            if res["exito"]:
+                print(
+                    f"[API] 1 {res['moneda'].upper()} "
+                    f"= ${res['valor']} "
+                    f"({res['unidad']})\n"
+                )
+
+            else:
+                print(
+                    f"[API ERROR] "
+                    f"{res['mensaje']}\n"
+                )
 
 
 if __name__ == "__main__":
