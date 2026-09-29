@@ -83,21 +83,54 @@ class Departamento:
 
 class Proyecto:
     """Identifica un proyecto en curso con su fecha de inicio."""
-    def __init__(self, id_proyecto: int, nombre_proyecto: str, fecha_inicio: str):
+
+    def __init__(
+        self,
+        id_proyecto: int,
+        nombre_proyecto: str,
+        fecha_inicio: str
+    ):
         self.id_proyecto = id_proyecto
         self.nombre_proyecto = nombre_proyecto
         self.fecha_inicio = fecha_inicio
         self._empleados: list[Empleado] = []
 
     def asignar_empleado(self, empleado: Empleado) -> str:
-        """Asigna un empleado al proyecto y devuelve un mensaje de confirmación."""
-        self._empleados.append(empleado)
-        return f"Empleado {empleado.nombre} asignado al proyecto {self.nombre_proyecto}."
+        """Asigna un empleado al proyecto."""
+
+        if empleado not in self._empleados:
+            self._empleados.append(empleado)
+
+            return (
+                f"Empleado {empleado.nombre} asignado al proyecto "
+                f"{self.nombre_proyecto}."
+            )
+
+        return (
+            f"El empleado {empleado.nombre} ya está asignado al proyecto "
+            f"{self.nombre_proyecto}."
+        )
 
     def desasignar_empleado(self, empleado: Empleado) -> str:
-        """Desasigna un empleado del proyecto y devuelve un mensaje de confirmación."""
-        self._empleados.remove(empleado)
-        return f"Empleado {empleado.nombre} removido del proyecto {self.nombre_proyecto}."
+        """Desasigna un empleado del proyecto."""
+
+        if empleado in self._empleados:
+            self._empleados.remove(empleado)
+
+            return (
+                f"Empleado {empleado.nombre} removido del proyecto "
+                f"{self.nombre_proyecto}."
+            )
+
+        return (
+            f"El empleado {empleado.nombre} no está asignado al proyecto "
+            f"{self.nombre_proyecto}."
+        )
+
+    @property
+    def empleados(self) -> list[Empleado]:
+        """Devuelve una copia de los empleados asignados al proyecto."""
+        return self._empleados.copy()
 
 
 class RegistroHoras:
