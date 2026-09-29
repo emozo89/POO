@@ -68,7 +68,7 @@ def inicializar_bd():
         try:
             with conn:
                 conn.executescript(script)
-                
+
             # Poblar datos iniciales si la BD está vacía
             cursor = conn.cursor()
             cursor.execute("SELECT COUNT(*) FROM departamentos;")
@@ -84,28 +84,49 @@ def inicializar_bd():
 # --- OPERACIONES CRUD DE EMPLEADOS ---
 
 def crear_empleado(nombre: str, rut: str, correo: str, fecha_ingreso: str, salario: float, cargo: str, id_depto: int) -> bool:
-    """Crea un nuevo empleado en la base de datos."""
+    """Crea un nuevo empleado guardando primero en Persona y luego en Empleado."""
     conn = obtener_conexion()
-    if not conn: 
+    if not conn:
         return False
     try:
-        with conn:
-            conn.execute(
-                "INSERT INTO empleados (nombre, rut, correo, fecha_ingreso, salario, cargo, id_departamento) VALUES (?, ?, ?, ?, ?, ?, ?);",
-                (nombre, rut, correo, fecha_ingreso, salario, cargo, id_depto)
-            )
+        cursor = conn.cursor()
+
+        # 1. Insertar en tabla base Persona
+        cursor.execute(
+            "INSERT INTO Persona (rut, nombre, correo) VALUES (?, ?, ?);",
+            (rut, nombre, correo)
+        )
+
+        # 2. Insertar en tabla derivada Empleado
+        cursor.execute(
+            """INSERT INTO Empleado (rut, fecha_ingreso, salario, cargo, idDepartamento)
+               VALUES (?, ?, ?, ?, ?);""",
+            (rut, fecha_ingreso, salario, cargo, id_depto)
+        )
+
+        conn.commit()
         return True
-    except sqlite3.IntegrityError:
-        print("[ERROR] El RUT ya está registrado.")
+    except sqlite3.IntegrityError as e:
+        msg = str(e).lower()
+        if "foreign key" in msg:
+            print(f"\n[ERROR] El ID de Departamento ({id_depto}) no existe en la base de datos.")
+        elif "unique" in msg or "primary key" in msg:
+            print(f"\n[ERROR] El RUT '{rut}' ya se encuentra registrado.")
+        else:
+            print(f"\n[ERROR DE INTEGRIDAD]: {e}")
+        conn.rollback()
         return False
     except sqlite3.Error as e:
-        print(f"[ERROR BD]: {e}")
+        print(f"\n[ERROR BD]: {e}")
+        conn.rollback()
         return False
+    finally:
+        conn.close()
 
 def obtener_empleados() -> list:
     """Obtiene todos los empleados de la base de datos."""
     conn = obtener_conexion()
-    if not conn: 
+    if not conn:
         return []
     try:
         cursor = conn.cursor()
@@ -117,7 +138,7 @@ def obtener_empleados() -> list:
 def actualizar_empleado(id_emp: int, nombre: str, correo: str, salario: float, cargo: str) -> bool:
     """Actualiza la información de un empleado en la base de datos."""
     conn = obtener_conexion()
-    if not conn: 
+    if not conn:
         return False
     try:
         with conn:
@@ -132,7 +153,7 @@ def actualizar_empleado(id_emp: int, nombre: str, correo: str, salario: float, c
 def eliminar_empleado(id_emp: int) -> bool:
     """Elimina un empleado de la base de datos."""
     conn = obtener_conexion()
-    if not conn: 
+    if not conn:
         return False
     try:
         with conn:
@@ -140,4 +161,3 @@ def eliminar_empleado(id_emp: int) -> bool:
             return cursor.rowcount > 0
     finally:
         conn.close()
-        
