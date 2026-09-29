@@ -8,7 +8,7 @@ from database import (
     actualizar_empleado, eliminar_empleado
 )
 from auth import autenticar_usuario
-from services import obtener_indicador_economico, obtener_clima_santiago
+from services import obtener_indicador_economico, obtener_clima_santiago, validar_moneda
 
 def login():
     """Solicita credenciales al usuario y verifica autenticación."""
@@ -100,6 +100,9 @@ def menu_principal():
 
         elif opcion == "6":
             ind = input("Moneda a consultar (dolar, euro, uf): ").strip()
+            if not validar_moneda(ind):
+                print("[ERROR] Moneda no válida. Intente nuevamente.\n")
+                continue
             res = obtener_indicador_economico(ind)
             if res["exito"]:
                 print(f"[API] 1 {res['moneda'].upper()} = ${res['valor']} ({res['unidad']})\n")
