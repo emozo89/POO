@@ -66,102 +66,245 @@ def inicializar_bd():
     );
     """
     conn = obtener_conexion()
-    if conn:
-        try:
-            with conn:
-                conn.executescript(script)
+
+    if conn is None:
+        return
+
+    try:
+        with conn:
+            # Crear las tablas
+            conn.executescript(script)
 
             # Poblar datos iniciales si la BD está vacía
             cursor = conn.cursor()
-            cursor.execute("SELECT COUNT(*) FROM departamentos;")
+
+            cursor.execute(
+                "SELECT COUNT(*) FROM departamentos;"
+            )
+
             if cursor.fetchone()[0] == 0:
-                conn.execute("INSERT INTO departamentos (id_departamento, nombre_depto) VALUES (13, 'Desarrollo Sostenible'), (1, 'RRHH'), (2, 'Ventas'), (3, 'Investigación y Desarrollo');")
-                conn.execute("INSERT INTO empleados (id_empleado, nombre, rut, correo, fecha_ingreso, salario, cargo, id_departamento) VALUES (1, 'Carmen Lopez', '11.111.111-1', 'carmen@ecotech.cl', '2022-01-15', 1200000, 'Analista', 13), (2, 'Juan Gomez', '22.222.222-2', 'juan@ecotech.cl', '2023-03-10', 1400000, 'Desarrollador', 13);")
-                conn.execute("INSERT INTO proyectos (id_proyecto, nombre_proyecto, fecha_inicio) VALUES (25, 'Campaña verde', '2023-12-13'), (14, 'Evolución sostenible', '2025-08-14');")
-        except sqlite3.Error as e:
-            print(f"[ERROR BD] Fallo en inicialización: {e}")
-        finally:
-            conn.close()
+                conn.execute(
+                    """
+                    INSERT INTO departamentos
+                    (id_departamento, nombre_depto)
+                    VALUES
+                    (13, 'Desarrollo Sostenible'),
+                    (1, 'RRHH'),
+                    (2, 'Ventas'),
+                    (3, 'Investigación y Desarrollo');
+                    """
+                )
+
+                conn.execute(
+                    """
+                    INSERT INTO empleados
+                    (
+                        id_empleado,
+                        nombre,
+                        rut,
+                        correo,
+                        fecha_ingreso,
+                        salario,
+                        cargo,
+                        id_departamento
+                    )
+                    VALUES
+                    (
+                        1,
+                        'Carmen Lopez',
+                        '11.111.111-1',
+                        'carmen@ecotech.cl',
+                        '2022-01-15',
+                        1200000,
+                        'Analista',
+                        13
+                    ),
+                    (
+                        2,
+                        'Juan Gomez',
+                        '22.222.222-2',
+                        'juan@ecotech.cl',
+                        '2023-03-10',
+                        1400000,
+                        'Desarrollador',
+                        13
+                    );
+                    """
+                )
+
+                conn.execute(
+                    """
+                    INSERT INTO proyectos
+                    (
+                        id_proyecto,
+                        nombre_proyecto,
+                        fecha_inicio
+                    )
+                    VALUES
+                    (
+                        25,
+                        'Campaña verde',
+                        '2023-12-13'
+                    ),
+                    (
+                        14,
+                        'Evolución sostenible',
+                        '2025-08-14'
+                    );
+                    """
+                )
+
+    except sqlite3.Error as e:
+        print(f"[ERROR BD] Fallo en inicialización: {e}")
+
+    finally:
+        conn.close()
 
 # --- OPERACIONES CRUD DE EMPLEADOS ---
 
-def crear_empleado(nombre: str, rut: str, correo: str, fecha_ingreso: str, salario: float, cargo: str, id_depto: int) -> bool:
-    """Crea un nuevo empleado guardando primero en Persona y luego en Empleado."""
+def crear_empleado(
+    nombre: str,
+    rut: str,
+    correo: str,
+    fecha_ingreso: str,
+    salario: float,
+    cargo: str,
+    id_depto: int
+) -> bool:
+    """Crea un nuevo empleado en la base de datos."""
+
     conn = obtener_conexion()
+
     if not conn:
         return False
+
     try:
         cursor = conn.cursor()
 
-        # 1. Insertar en tabla base Persona
         cursor.execute(
-            "INSERT INTO Persona (rut, nombre, correo) VALUES (?, ?, ?);",
-            (rut, nombre, correo)
-        )
-
-        # 2. Insertar en tabla derivada Empleado
-        cursor.execute(
-            """INSERT INTO Empleado (rut, fecha_ingreso, salario, cargo, idDepartamento)
-               VALUES (?, ?, ?, ?, ?);""",
-            (rut, fecha_ingreso, salario, cargo, id_depto)
+            """
+            INSERT INTO empleados
+            (nombre, rut, correo, fecha_ingreso, salario, cargo, id_departamento)
+            VALUES (?, ?, ?, ?, ?, ?, ?);
+            """,
+            (
+                nombre,
+                rut,
+                correo,
+                fecha_ingreso,
+                salario,
+                cargo,
+                id_depto
+            )
         )
 
         conn.commit()
         return True
+
     except sqlite3.IntegrityError as e:
         msg = str(e).lower()
+
         if "foreign key" in msg:
-            print(f"\n[ERROR] El ID de Departamento ({id_depto}) no existe en la base de datos.")
-        elif "unique" in msg or "primary key" in msg:
-            print(f"\n[ERROR] El RUT '{rut}' ya se encuentra registrado.")
+            print(
+                f"[ERROR] El departamento {id_depto} no existe."
+            )
+
+        elif "unique" in msg:
+            print(
+                f"[ERROR] El RUT '{rut}' ya se encuentra registrado."
+            )
+
         else:
-            print(f"\n[ERROR DE INTEGRIDAD]: {e}")
+            print(f"[ERROR DE INTEGRIDAD]: {e}")
+
         conn.rollback()
         return False
+
     except sqlite3.Error as e:
-        print(f"\n[ERROR BD]: {e}")
+        print(f"[ERROR BD]: {e}")
         conn.rollback()
         return False
+
     finally:
         conn.close()
 
 def obtener_empleados() -> list:
     """Obtiene todos los empleados de la base de datos."""
+
     conn = obtener_conexion()
+
     if not conn:
         return []
+
     try:
         cursor = conn.cursor()
-        cursor.execute("""
+
+        cursor.execute(
+            """
             SELECT
                 e.id_empleado,
-                p.nombre,
-                p.rut,
-                p.correo,
+                e.nombre,
+                e.rut,
+                e.correo,
                 e.fecha_ingreso,
                 e.salario,
                 e.cargo,
-                d.nombreDepartamento
-            FROM Empleado e
-            LEFT JOIN Persona p ON e.rut = p.rut
-            LEFT JOIN Departamento d ON e.idDepartamento = d.idDepartamento
-        """)
+                d.nombre_depto
+            FROM empleados e
+            LEFT JOIN departamentos d
+                ON e.id_departamento = d.id_departamento;
+            """
+        )
+
         return cursor.fetchall()
+
+    except sqlite3.Error as e:
+        print(f"[ERROR BD]: {e}")
+        return []
+
     finally:
         conn.close()
 
-def actualizar_empleado(id_emp: int, nombre: str, correo: str, salario: float, cargo: str) -> bool:
-    """Actualiza la información de un empleado en la base de datos."""
+def actualizar_empleado(
+    id_emp: int,
+    nombre: str,
+    correo: str,
+    salario: float,
+    cargo: str
+) -> bool:
+    """Actualiza un empleado."""
+
     conn = obtener_conexion()
+
     if not conn:
         return False
+
     try:
         with conn:
             cursor = conn.execute(
-                "UPDATE Empleado SET nombre = ?, correo = ?, salario = ?, cargo = ? WHERE id_empleado = ?;",
-                (nombre, correo, salario, cargo, id_emp)
+                """
+                UPDATE empleados
+                SET nombre = ?,
+                    correo = ?,
+                    salario = ?,
+                    cargo = ?
+                WHERE id_empleado = ?;
+                """,
+                (
+                    nombre,
+                    correo,
+                    salario,
+                    cargo,
+                    id_emp
+                )
             )
+
             return cursor.rowcount > 0
+
+    except sqlite3.Error as e:
+        print(f"[ERROR BD]: {e}")
+        return False
+
     finally:
         conn.close()
 

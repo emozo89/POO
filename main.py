@@ -113,4 +113,8 @@ def menu_principal():
 
 if __name__ == "__main__":
     inicializar_bd()
-    menu_principal()
+
+    if login():
+        menu_principal()
+    else:
+        print("[ACCESO BLOQUEADO] Máximo de intentos alcanzado.")
