@@ -1,8 +1,10 @@
  # Conexión SQLite y Operaciones CRUD (U2 - Paso 3 y 4)
 
+import os
 import sqlite3
 
-DB_NAME = "ecotech.db"
+BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+DB_NAME = os.path.join(BASE_DIR, "app_ecotech.db")
 
 def obtener_conexion():
     """Establece conexión con SQLite activando llaves foráneas para integridad referencial."""
