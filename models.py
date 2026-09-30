@@ -38,7 +38,7 @@ class Persona:
 
 
 class Empleado(Persona):
-    """Clase derivada (Subclase) que hereda de Persona e incorpora atributos laborales."""
+    """Clase derivada que hereda de Persona e incorpora atributos laborales."""
 
     def __init__(
         self,
@@ -50,19 +50,53 @@ class Empleado(Persona):
         salario: float = 0.0,
         cargo: str = None
     ):
-        # Delegate a la superclase Persona la inicialización de atributos personales
-        super().__init__(nombre=nombre, rut=rut, correo=correo)
+        # Inicialización de los atributos heredados desde Persona
+        super().__init__(
+            nombre=nombre,
+            rut=rut,
+            correo=correo
+        )
 
-        # Atributos propios de Empleado
+        # Atributos propios encapsulados de Empleado
         self._id_empleado = id_empleado
-        self.fecha_ingreso = fecha_ingreso
-        self.salario = salario
-        self.cargo = cargo
+        self._fecha_ingreso = fecha_ingreso
+        self._salario = salario
+        self._cargo = cargo
 
     @property
     def id_empleado(self) -> int:
         """Devuelve el ID del empleado."""
         return self._id_empleado
+
+    @property
+    def fecha_ingreso(self) -> str:
+        """Devuelve la fecha de ingreso del empleado."""
+        return self._fecha_ingreso
+
+    @fecha_ingreso.setter
+    def fecha_ingreso(self, nueva_fecha: str):
+        """Modifica la fecha de ingreso del empleado."""
+        self._fecha_ingreso = nueva_fecha
+
+    @property
+    def salario(self) -> float:
+        """Devuelve el salario del empleado."""
+        return self._salario
+
+    @salario.setter
+    def salario(self, nuevo_salario: float):
+        """Modifica el salario del empleado."""
+        self._salario = nuevo_salario
+
+    @property
+    def cargo(self) -> str:
+        """Devuelve el cargo del empleado."""
+        return self._cargo
+
+    @cargo.setter
+    def cargo(self, nuevo_cargo: str):
+        """Modifica el cargo del empleado."""
+        self._cargo = nuevo_cargo
 
 class Departamento:
     """Representa un departamento de EcoTech Solutions."""
@@ -135,18 +169,72 @@ class Proyecto:
 
 class RegistroHoras:
     """Trazabilidad de horas trabajadas por empleado y proyecto asignado."""
-    def __init__(self, id_registro: int, id_empleado: int, id_proyecto: int, horas_trabajadas: int, fecha: str = None, hora_entrada: str = "09:00", hora_salida: str = "18:00"):
-        self.id_registro = id_registro
-        self.id_empleado = id_empleado
-        self.id_proyecto = id_proyecto
-        self.horas_trabajadas = horas_trabajadas
-        self.fecha = fecha or datetime.now().strftime("%Y-%m-%d")
-        self.hora_entrada = hora_entrada
-        self.hora_salida = hora_salida
+
+    def __init__(
+        self,
+        id_registro: int,
+        id_empleado: int,
+        id_proyecto: int,
+        horas_trabajadas: int,
+        fecha: str = None,
+        hora_entrada: str = "09:00",
+        hora_salida: str = "18:00"
+    ):
+        self._id_registro = id_registro
+        self._id_empleado = id_empleado
+        self._id_proyecto = id_proyecto
+        self._horas_trabajadas = horas_trabajadas
+        self._fecha = fecha or datetime.now().strftime("%Y-%m-%d")
+        self._hora_entrada = hora_entrada
+        self._hora_salida = hora_salida
+
+    @property
+    def id_registro(self) -> int:
+        """Devuelve el ID del registro."""
+        return self._id_registro
+
+    @property
+    def id_empleado(self) -> int:
+        """Devuelve el ID del empleado asociado."""
+        return self._id_empleado
+
+    @property
+    def id_proyecto(self) -> int:
+        """Devuelve el ID del proyecto asociado."""
+        return self._id_proyecto
+
+    @property
+    def horas_trabajadas(self) -> int:
+        """Devuelve las horas trabajadas."""
+        return self._horas_trabajadas
+
+    @horas_trabajadas.setter
+    def horas_trabajadas(self, nuevas_horas: int):
+        """Modifica las horas trabajadas."""
+        self._horas_trabajadas = nuevas_horas
+
+    @property
+    def fecha(self) -> str:
+        """Devuelve la fecha del registro."""
+        return self._fecha
+
+    @property
+    def hora_entrada(self) -> str:
+        """Devuelve la hora de entrada."""
+        return self._hora_entrada
+
+    @property
+    def hora_salida(self) -> str:
+        """Devuelve la hora de salida."""
+        return self._hora_salida
 
     def registrar_horas(self) -> str:
         """Registra las horas trabajadas y devuelve un mensaje de confirmación."""
-        return f"Registradas {self.horas_trabajadas} hrs para empleado ID {self.id_empleado} en proyecto ID {self.id_proyecto}."
+        return (
+            f"Registradas {self.horas_trabajadas} hrs "
+            f"para empleado ID {self.id_empleado} "
+            f"en proyecto ID {self.id_proyecto}."
+        )
 
     def consultar_horas(self) -> int:
         """Devuelve la cantidad de horas trabajadas registradas."""
@@ -155,15 +243,80 @@ class RegistroHoras:
 
 class Informe:
     """Información consolidada generada a solicitud de las partes interesadas."""
-    def __init__(self, id_informe: int, id_empleado: int, id_proyecto: int, id_departamento: int, reporte_horas: str = "", reporte_proyecto: str = "", reporte_empleado: str = ""):
-        self.id_informe = id_informe
-        self.id_empleado = id_empleado
-        self.id_proyecto = id_proyecto
-        self.id_departamento = id_departamento
-        self.reporte_horas = reporte_horas
-        self.reporte_proyecto = reporte_proyecto
-        self.reporte_empleado = reporte_empleado
+
+    def __init__(
+        self,
+        id_informe: int,
+        id_empleado: int,
+        id_proyecto: int,
+        id_departamento: int,
+        reporte_horas: str = "",
+        reporte_proyecto: str = "",
+        reporte_empleado: str = ""
+    ):
+        self._id_informe = id_informe
+        self._id_empleado = id_empleado
+        self._id_proyecto = id_proyecto
+        self._id_departamento = id_departamento
+        self._reporte_horas = reporte_horas
+        self._reporte_proyecto = reporte_proyecto
+        self._reporte_empleado = reporte_empleado
+
+    @property
+    def id_informe(self) -> int:
+        """Devuelve el ID del informe."""
+        return self._id_informe
+
+    @property
+    def id_empleado(self) -> int:
+        """Devuelve el ID del empleado asociado."""
+        return self._id_empleado
+
+    @property
+    def id_proyecto(self) -> int:
+        """Devuelve el ID del proyecto asociado."""
+        return self._id_proyecto
+
+    @property
+    def id_departamento(self) -> int:
+        """Devuelve el ID del departamento asociado."""
+        return self._id_departamento
+
+    @property
+    def reporte_horas(self) -> str:
+        """Devuelve el reporte de horas."""
+        return self._reporte_horas
+
+    @reporte_horas.setter
+    def reporte_horas(self, nuevo_reporte: str):
+        """Modifica el reporte de horas."""
+        self._reporte_horas = nuevo_reporte
+
+    @property
+    def reporte_proyecto(self) -> str:
+        """Devuelve el reporte del proyecto."""
+        return self._reporte_proyecto
+
+    @reporte_proyecto.setter
+    def reporte_proyecto(self, nuevo_reporte: str):
+        """Modifica el reporte del proyecto."""
+        self._reporte_proyecto = nuevo_reporte
+
+    @property
+    def reporte_empleado(self) -> str:
+        """Devuelve el reporte del empleado."""
+        return self._reporte_empleado
+
+    @reporte_empleado.setter
+    def reporte_empleado(self, nuevo_reporte: str):
+        """Modifica el reporte del empleado."""
+        self._reporte_empleado = nuevo_reporte
 
     def generar_reporte(self) -> str:
-        """Genera un resumen del informe y devuelve un mensaje de confirmación."""
-        return f"Informe #{self.id_informe} [Empleado: {self.id_empleado}, Proyecto: {self.id_proyecto}, Depto: {self.id_departamento}]"
+        """Genera un resumen del informe."""
+        return (
+            f"Informe #{self.id_informe} "
+            f"[Empleado: {self.id_empleado}, "
+            f"Proyecto: {self.id_proyecto}, "
+            f"Depto: {self.id_departamento}]"
+        )
