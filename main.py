@@ -155,7 +155,12 @@ def menu_principal():
                     f"[API ERROR] "
                     f"{res['mensaje']}\n"
                 )
+        elif opcion == "7":
+            print("\nCerrando sesión en EcoTech Solutions. Hasta pronto.")
+            break
 
+        else:
+            print("\n[OPCIÓN INVÁLIDA] Intente nuevamente.\n")
 
 if __name__ == "__main__":
     inicializar_bd()
