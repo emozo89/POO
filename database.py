@@ -310,12 +310,37 @@ def actualizar_empleado(
 
 def eliminar_empleado(id_emp: int) -> bool:
     """Elimina un empleado de la base de datos."""
+
     conn = obtener_conexion()
+
     if not conn:
         return False
+
     try:
         with conn:
-            cursor = conn.execute("DELETE FROM empleados WHERE id_empleado = ?;", (id_emp,))
+            cursor = conn.execute(
+                """
+                DELETE FROM empleados
+                WHERE id_empleado = ?;
+                """,
+                (id_emp,)
+            )
+
             return cursor.rowcount > 0
+
+    except sqlite3.IntegrityError as e:
+        print(
+            "[ERROR DE INTEGRIDAD] "
+            "No se puede eliminar el empleado porque "
+            "existen registros relacionados."
+        )
+        print(f"Detalle técnico: {e}")
+        return False
+
+    except sqlite3.Error as e:
+        print(f"[ERROR BD] No se pudo eliminar el empleado: {e}")
+        return False
+
     finally:
         conn.close()
+
